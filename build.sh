@@ -124,10 +124,12 @@ else
 fi
 echo "Using tag [$tag] for building container based on [$base]"
 echo "Stop, remove and build container..."
-docker stop "$repo"mltk-container-$tag
-docker rm "$repo"mltk-container-$tag
-docker rmi "$repo"mltk-container-$tag
-docker build --rm -t "$repo"mltk-container-$tag:latest --build-arg BASE_IMAGE=$base --build-arg TAG=$tag -f $dockerfile .
+docker stop "$repo"mltk-container-$tag || true
+docker rm "$repo"mltk-container-$TAG || true
+docker rmi "$repo"mltk-container-$tag || true
+docker build --rm -t "$repo"mltk-container-$tag:latest -f $dockerfile . || \
+	docker build --rm -t torch-tf-base -f Dockerfile.torch-tf-base --build-arg BASE_IMAGE=$base --build-arg TAG=$tag . \
+	&& docker build --rm -t "$repo"mltk-container-$tag:latest -f $dockerfile .
 if [ -z "$3" ]; then
   version=""
 else
